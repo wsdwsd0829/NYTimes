@@ -1,3 +1,26 @@
+Answers:
+Handle pages: 
+1.
+a) I used Paginator(and abstract counter) to handle pages loading: when reaches last five, trigger next page loading
+b) Can also add a "Load More" button which I see in some apps, may better solve problem 2 regarding to rate limit. 
+c) async display kit to trigger loading which reach interfaceState(Prefetch)
+
+2. 
+issues:
+a) if reach limit, NYT may not able to hanlde request of punish client for not providing service for certain amount time;
+b) or some users request just not response timely 
+
+potential solution:
+a) apply multiple keys, round robin provided from our server etc  :)
+b) if our own server, use load balancing. 
+c) use our server as redirect to NYT api to to control rate limit avoid api punishment from NYT side. 
+d) delay response to user from client side. 
+e) let user know what happens and try later.
+f) switch to "lazy loading" like "Load More" button rather to infinit scroll when received rate limit signal from server;
+ 
+
+
+
 Feature: 
 1. infinite scroll
 2. throttle search
