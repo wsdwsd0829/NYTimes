@@ -21,5 +21,4 @@
 -(instancetype) initWithNetworkService: (id<NetworkServiceProtocol>) networkService withMessageManager: (id<MessageManagerProtocol>) messageManager;
 -(void) p_handleError:(NSError*)error;
 
-
 @end

@@ -9,7 +9,7 @@
 #import "ArticlesViewModel.h"
 #import "Paginator.h"
 
-NSString* const defaultQuery = @"sing";
+NSString* const defaultQuery = @"hotel";
 CGFloat const SearchInterval = 0.7;
 
 @interface ArticlesViewModel()

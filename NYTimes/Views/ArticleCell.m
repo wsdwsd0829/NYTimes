@@ -21,30 +21,33 @@
 -(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
-        self.thumbnailView = [[UIImageView alloc] init];
-        self.headlineLabel  = [[UILabel alloc] init];
-        self.headlineLabel.numberOfLines = 0;
-        self.headlineLabel.lineBreakMode = NSLineBreakByWordWrapping;
-        
-        [self.contentView addSubview:self.thumbnailView];
-        [self.contentView addSubview:self.headlineLabel];
-        self.thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
-        self.thumbnailView.clipsToBounds = YES;
+        [self setupUI];
         [self setupConstraints];
     }
     return self;
 }
 
+-(void)setupUI {
+    self.thumbnailView = [[UIImageView alloc] init];
+    self.headlineLabel  = [[UILabel alloc] init];
+    self.headlineLabel.numberOfLines = 0;
+    self.headlineLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    
+    [self.contentView addSubview:self.thumbnailView];
+    [self.contentView addSubview:self.headlineLabel];
+    self.thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
+    self.thumbnailView.clipsToBounds = YES;
+}
+
 -(void) setupConstraints {
+    
     [self.thumbnailView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.width.equalTo(@80);
         make.height.equalTo(@80);
-        //make.
         make.trailing.equalTo(self.headlineLabel.mas_leading).offset(-20);
         make.leading.equalTo(self.contentView.mas_leading).offset(8);
         make.top.equalTo(self.contentView.mas_top).offset(8);
-        make.bottom.equalTo(self.contentView.mas_bottom).offset(-8).with.priority(900);
-        //make.edges.insets(padding);
+        make.bottom.lessThanOrEqualTo(self.contentView.mas_bottom).offset(-8);
     }];
     [self.headlineLabel mas_updateConstraints:^(MASConstraintMaker *make) {
         make.trailing.equalTo(self.contentView.mas_trailing).offset(-8);
