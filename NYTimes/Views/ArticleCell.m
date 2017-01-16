@@ -7,20 +7,17 @@
 //
 
 #import "ArticleCell.h"
-#import <SDWebImage/UIImageView+WebCache.h>
 
 @interface ArticleCell ()
-
-@property (nonatomic) UIImageView* thumbnailView;
-@property (nonatomic) UILabel* headlineLabel;
-
 @end
 
 @implementation ArticleCell
+
 +(NSString*) identifier {
-    return @"ArticleCell";
+    return NSStringFromClass(self);
 }
-//diff from collection
+
+//diff from collectionView with is initWithFrame
 -(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
@@ -64,11 +61,6 @@
 
 -(void)layoutSubviews {
     [super layoutSubviews];
-    
-}
--(void)updateUI {
-    [self.thumbnailView sd_setImageWithURL:[NSURL URLWithString:  self.thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
-    self.headlineLabel.text = self.headline;
 }
 
 @end

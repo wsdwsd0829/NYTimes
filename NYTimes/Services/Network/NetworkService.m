@@ -16,6 +16,7 @@ NSString* const APIKey = @"60aeaeae7fff4477958cfe2a8a6a76f5";
 typedef NS_ENUM(NSUInteger, NYTimesAPI) {
  Article
 };
+
 @interface NetworkService () {
     id<ApiClientProtocol> apiClient;
     id<ParserProtocol> parser;
@@ -110,6 +111,7 @@ typedef NS_ENUM(NSUInteger, NYTimesAPI) {
         [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:@"kNotReachable"];
     }
 }
+
 -(void)networkChangedFromOfflineToOnline:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:kNetworkOfflineToOnline object: notification.object];
 }

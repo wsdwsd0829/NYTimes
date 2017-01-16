@@ -12,14 +12,17 @@
 #import "Article.h"
 #import "ArticleCell.h"
 #import "Paginator.h"
+#import <SDWebImage/UIImageView+WebCache.h>
+
 NSString* const defaultQuery = @"sing";
 CGFloat const SearchInterval = 0.7;
 
 @interface ViewController ()
+//main items
 @property (nonatomic) UITableView* tableView;
 @property (nonatomic) id<NetworkServiceProtocol> networkService;
 @property (nonatomic) NSMutableArray<Article*>* articles;
-
+//search
 @property (nonatomic) UISearchController* searchController;
 @property (nonatomic) NSTimer* timer;
 @property (nonatomic) Paginator* paginator;
@@ -33,34 +36,68 @@ CGFloat const SearchInterval = 0.7;
 @end
 
 @implementation ViewController
-
+//MARK: life cycle methods;
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //table view
+    [self setupTableView];
+    [self setupBars];
+
+    //prepare for loading data
+    self.paginator = [[Paginator alloc] initWithPageNumber:0];
+    self.query = defaultQuery;
+    self.networkService = [[NetworkService alloc] init];
+    [self searchArticles: nil];
+}
+
+-(void) setupTableView {
     self.tableView = [[UITableView alloc] init];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.estimatedRowHeight = 100;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     [self.tableView registerClass:[ArticleCell class] forCellReuseIdentifier:[ArticleCell identifier]];
+    
     [self.view addSubview: self.tableView];
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
     }];
     
-    self.searchController = [[UISearchController alloc] initWithSearchResultsController: nil];
-    self.tableView.tableHeaderView = self.searchController.searchBar;
-    self.searchController.searchResultsUpdater = self;
-    self.query = defaultQuery;
+    //activity indicator
     CGRect footerRect = CGRectMake(0, 0, self.view.bounds.size.width, 40);
     UIView* footerView = [[UIView alloc] initWithFrame:footerRect];
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [footerView addSubview: self.activityIndicator];
-     self.activityIndicator.center = footerView.center;
+    self.activityIndicator.center = footerView.center;
     self.tableView.tableFooterView = footerView;
+}
+
+-(void)setupBars {
+    //search bar
+    self.searchController = [[UISearchController alloc] initWithSearchResultsController: nil];
+    self.tableView.tableHeaderView = self.searchController.searchBar;
     
-    self.paginator = [[Paginator alloc] initWithPageNumber:0];
-    self.networkService = [[NetworkService alloc] init];
-    [self searchArticles: nil];
+    //bar button item
+    UIBarButtonItem* bbi = [[UIBarButtonItem alloc] initWithImage: [UIImage imageNamed:@"uparrow"] style:UIBarButtonItemStylePlain target:self action:@selector(scrollToTop)];
+    self.navigationItem.rightBarButtonItem = bbi;
+    self.searchController.searchResultsUpdater = self;
+}
+//notification
+-(void)setupNotifications {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNetworkOfflineToOnline object:nil];
+}
+
+-(void)networkChanged:(NSNotification*) notification {
+    //will trigger next page loading if necessary
+    [self.tableView reloadData];
+}
+
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+//MARK: search loading and user actions
+-(void) scrollToTop {
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 -(void)searchArticles: (nullable NSTimer*) timer {
@@ -99,8 +136,7 @@ CGFloat const SearchInterval = 0.7;
 }
 @end
 
-
-//MARK: SearchViewController
+//MARK: SearchController
 @implementation ViewController (SearchViewController)
 -(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     if(searchController == self.searchController) {
@@ -125,15 +161,22 @@ CGFloat const SearchInterval = 0.7;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.articles.count;
 }
+
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-   ArticleCell* cell = [tableView dequeueReusableCellWithIdentifier:[ArticleCell identifier] forIndexPath:indexPath];
-    cell.headline = self.articles[indexPath.row].headline;
-    cell.thumbnailUrl = self.articles[indexPath.row].thumbnailUrl;
-    [cell updateUI];
-    if(indexPath.row == self.articles.count - 5) {
-        [self loadNextPage];
-    }
+   UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:[ArticleCell identifier] forIndexPath:indexPath];
+    [self configCell:cell forIndexPath:indexPath];
     return cell;
+}
+
+-(void) configCell:(UITableViewCell*) aCell forIndexPath:(NSIndexPath*) indexPath {
+    if([aCell isKindOfClass: [ArticleCell class]]) {
+        ArticleCell* cell = (ArticleCell*) aCell;
+        cell.headlineLabel.text = self.articles[indexPath.row].headline;
+        [cell.thumbnailView sd_setImageWithURL:[NSURL URLWithString: self.articles[indexPath.row].thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+        if(indexPath.row == self.articles.count - 5) {
+            [self loadNextPage];
+        }
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -143,8 +186,5 @@ CGFloat const SearchInterval = 0.7;
     dc.navigationItem.title = article.headline;
     [self.navigationController pushViewController:dc animated:YES];
 }
-
-
-
 @end
 

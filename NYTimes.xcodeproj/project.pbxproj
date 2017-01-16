@@ -66,6 +66,7 @@
 		0D46A28A1E2C3D6100F08BB1 /* NSString+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Helper.m"; sourceTree = "<group>"; };
 		0D46A28C1E2C539600F08BB1 /* Paginator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Paginator.h; sourceTree = "<group>"; };
 		0D46A28D1E2C539600F08BB1 /* Paginator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Paginator.m; sourceTree = "<group>"; };
+		0D46A28F1E2C60AD00F08BB1 /* Helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
 		3B71EA19142D7A351C9399D7 /* Pods-NYTimes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.debug.xcconfig"; sourceTree = "<group>"; };
 		66FF1D1E37DF0EF11265E991 /* Pods_NYTimes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NYTimes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC592A91A962FBC414A78009 /* Pods-NYTimes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.release.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.release.xcconfig"; sourceTree = "<group>"; };
@@ -187,6 +188,7 @@
 				0D46A2871E2C3B6400F08BB1 /* NSArray+Helper.m */,
 				0D46A2891E2C3D6100F08BB1 /* NSString+Helper.h */,
 				0D46A28A1E2C3D6100F08BB1 /* NSString+Helper.m */,
+				0D46A28F1E2C60AD00F08BB1 /* Helper.h */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";

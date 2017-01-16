@@ -8,10 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface ArticleCell : UITableViewCell
-@property (nonatomic) NSString* headline;
-@property (nonatomic) NSString* thumbnailUrl;
+
+@property (nonatomic) UIImageView* thumbnailView;
+@property (nonatomic) UILabel* headlineLabel;
 +(NSString*) identifier;
--(void)updateUI;
+
 @end
