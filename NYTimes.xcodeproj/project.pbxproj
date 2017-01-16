@@ -24,6 +24,10 @@
 		0D46A2881E2C3B6400F08BB1 /* NSArray+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2871E2C3B6400F08BB1 /* NSArray+Helper.m */; };
 		0D46A28B1E2C3D6100F08BB1 /* NSString+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A28A1E2C3D6100F08BB1 /* NSString+Helper.m */; };
 		0D46A28E1E2C539600F08BB1 /* Paginator.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A28D1E2C539600F08BB1 /* Paginator.m */; };
+		0D46A2931E2C67F900F08BB1 /* ArticlesViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2921E2C67F900F08BB1 /* ArticlesViewModel.m */; };
+		0D46A2971E2C692200F08BB1 /* MessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2951E2C692200F08BB1 /* MessageManager.m */; };
+		0D46A29A1E2C6A4B00F08BB1 /* BaseItemsViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */; };
+		0D46A29D1E2C6EEA00F08BB1 /* UIViewController+Navigations.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A29C1E2C6EE900F08BB1 /* UIViewController+Navigations.m */; };
 		67952EFD4C751E88CF3E9546 /* Pods_NYTimes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66FF1D1E37DF0EF11265E991 /* Pods_NYTimes.framework */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +71,15 @@
 		0D46A28C1E2C539600F08BB1 /* Paginator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Paginator.h; sourceTree = "<group>"; };
 		0D46A28D1E2C539600F08BB1 /* Paginator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Paginator.m; sourceTree = "<group>"; };
 		0D46A28F1E2C60AD00F08BB1 /* Helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
+		0D46A2911E2C67F900F08BB1 /* ArticlesViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArticlesViewModel.h; path = ViewModel/ArticlesViewModel.h; sourceTree = "<group>"; };
+		0D46A2921E2C67F900F08BB1 /* ArticlesViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ArticlesViewModel.m; path = ViewModel/ArticlesViewModel.m; sourceTree = "<group>"; };
+		0D46A2941E2C692200F08BB1 /* MessageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageManager.h; sourceTree = "<group>"; };
+		0D46A2951E2C692200F08BB1 /* MessageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageManager.m; sourceTree = "<group>"; };
+		0D46A2961E2C692200F08BB1 /* MessageManagerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageManagerProtocol.h; sourceTree = "<group>"; };
+		0D46A2981E2C6A4B00F08BB1 /* BaseItemsViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseItemsViewModel.h; path = ViewModel/BaseItemsViewModel.h; sourceTree = "<group>"; };
+		0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseItemsViewModel.m; path = ViewModel/BaseItemsViewModel.m; sourceTree = "<group>"; };
+		0D46A29B1E2C6EE900F08BB1 /* UIViewController+Navigations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Navigations.h"; sourceTree = "<group>"; };
+		0D46A29C1E2C6EE900F08BB1 /* UIViewController+Navigations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Navigations.m"; sourceTree = "<group>"; };
 		3B71EA19142D7A351C9399D7 /* Pods-NYTimes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.debug.xcconfig"; sourceTree = "<group>"; };
 		66FF1D1E37DF0EF11265E991 /* Pods_NYTimes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NYTimes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC592A91A962FBC414A78009 /* Pods-NYTimes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.release.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.release.xcconfig"; sourceTree = "<group>"; };
@@ -105,6 +118,7 @@
 		0D46A2431E2C064900F08BB1 /* NYTimes */ = {
 			isa = PBXGroup;
 			children = (
+				0D46A2901E2C67DF00F08BB1 /* ViewModels */,
 				0D46A27F1E2C335100F08BB1 /* Controllers */,
 				0D46A27B1E2C1B4700F08BB1 /* Views */,
 				0D46A2741E2C191400F08BB1 /* Helpers */,
@@ -135,6 +149,9 @@
 		0D46A25C1E2C13CC00F08BB1 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				0D46A2941E2C692200F08BB1 /* MessageManager.h */,
+				0D46A2951E2C692200F08BB1 /* MessageManager.m */,
+				0D46A2961E2C692200F08BB1 /* MessageManagerProtocol.h */,
 				0D46A25E1E2C141900F08BB1 /* ApiClient.h */,
 				0D46A25F1E2C141900F08BB1 /* ApiClient.m */,
 				0D46A2601E2C141900F08BB1 /* ApiClientProtocol.h */,
@@ -180,6 +197,8 @@
 		0D46A2741E2C191400F08BB1 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				0D46A29B1E2C6EE900F08BB1 /* UIViewController+Navigations.h */,
+				0D46A29C1E2C6EE900F08BB1 /* UIViewController+Navigations.m */,
 				0D46A2751E2C192200F08BB1 /* Constants.h */,
 				0D46A2761E2C192200F08BB1 /* Constants.m */,
 				0D46A2781E2C195C00F08BB1 /* Utils.h */,
@@ -209,6 +228,17 @@
 				0D46A2811E2C338600F08BB1 /* DetailController.m */,
 			);
 			name = Controllers;
+			sourceTree = "<group>";
+		};
+		0D46A2901E2C67DF00F08BB1 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				0D46A2911E2C67F900F08BB1 /* ArticlesViewModel.h */,
+				0D46A2921E2C67F900F08BB1 /* ArticlesViewModel.m */,
+				0D46A2981E2C6A4B00F08BB1 /* BaseItemsViewModel.h */,
+				0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */,
+			);
+			name = ViewModels;
 			sourceTree = "<group>";
 		};
 		49B42CA50BE6AAFBFFED94F5 /* Frameworks */ = {
@@ -353,6 +383,7 @@
 				0D46A2721E2C151C00F08BB1 /* Article.m in Sources */,
 				0D46A24C1E2C064900F08BB1 /* ViewController.m in Sources */,
 				0D46A27E1E2C1B7F00F08BB1 /* ArticleCell.m in Sources */,
+				0D46A29D1E2C6EEA00F08BB1 /* UIViewController+Navigations.m in Sources */,
 				0D46A2491E2C064900F08BB1 /* AppDelegate.m in Sources */,
 				0D46A27A1E2C195C00F08BB1 /* Utils.m in Sources */,
 				0D46A28E1E2C539600F08BB1 /* Paginator.m in Sources */,
@@ -362,8 +393,11 @@
 				0D46A2821E2C338600F08BB1 /* DetailController.m in Sources */,
 				0D46A2881E2C3B6400F08BB1 /* NSArray+Helper.m in Sources */,
 				0D46A26C1E2C142E00F08BB1 /* Parser.m in Sources */,
+				0D46A2971E2C692200F08BB1 /* MessageManager.m in Sources */,
 				0D46A26B1E2C142E00F08BB1 /* NetworkService.m in Sources */,
+				0D46A2931E2C67F900F08BB1 /* ArticlesViewModel.m in Sources */,
 				0D46A2771E2C192200F08BB1 /* Constants.m in Sources */,
+				0D46A29A1E2C6A4B00F08BB1 /* BaseItemsViewModel.m in Sources */,
 				0D46A28B1E2C3D6100F08BB1 /* NSString+Helper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

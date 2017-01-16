@@ -9,24 +9,20 @@
 #import "ViewController.h"
 #import "DetailController.h"
 #import "NetworkService.h"
+#import "MessageManager.h"
 #import "Article.h"
+#import "ArticlesViewModel.h"
 #import "ArticleCell.h"
-#import "Paginator.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
-NSString* const defaultQuery = @"sing";
-CGFloat const SearchInterval = 0.7;
-
-@interface ViewController ()
+@interface ViewController () <ArticlesViewModelDelegate, MessageManagerDelegate>
 //main items
 @property (nonatomic) UITableView* tableView;
+@property (nonatomic) ArticlesViewModel* viewModel;
 @property (nonatomic) id<NetworkServiceProtocol> networkService;
-@property (nonatomic) NSMutableArray<Article*>* articles;
 //search
 @property (nonatomic) UISearchController* searchController;
-@property (nonatomic) NSTimer* timer;
-@property (nonatomic) Paginator* paginator;
-@property (nonatomic) NSString* query;
+
 @property (nonatomic) UIActivityIndicatorView* activityIndicator;
 @end
 
@@ -42,12 +38,14 @@ CGFloat const SearchInterval = 0.7;
     //table view
     [self setupTableView];
     [self setupBars];
-
+    [self setupNotifications];
     //prepare for loading data
-    self.paginator = [[Paginator alloc] initWithPageNumber:0];
-    self.query = defaultQuery;
-    self.networkService = [[NetworkService alloc] init];
-    [self searchArticles: nil];
+    id<NetworkServiceProtocol> networkService = [[NetworkService alloc] init];
+    id<MessageManagerProtocol> messageManager = [[MessageManager alloc] init];
+    messageManager.delegate = self;
+    self.viewModel = [[ArticlesViewModel alloc] initWithNetworkService:networkService withMessageManager:messageManager];
+    [self.viewModel searchArticles: nil];
+    self.viewModel.delegate = self;
 }
 
 -(void) setupTableView {
@@ -57,7 +55,6 @@ CGFloat const SearchInterval = 0.7;
     self.tableView.estimatedRowHeight = 100;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     [self.tableView registerClass:[ArticleCell class] forCellReuseIdentifier:[ArticleCell identifier]];
-    
     [self.view addSubview: self.tableView];
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
@@ -82,6 +79,7 @@ CGFloat const SearchInterval = 0.7;
     self.navigationItem.rightBarButtonItem = bbi;
     self.searchController.searchResultsUpdater = self;
 }
+
 //notification
 -(void)setupNotifications {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNetworkOfflineToOnline object:nil];
@@ -89,42 +87,26 @@ CGFloat const SearchInterval = 0.7;
 
 -(void)networkChanged:(NSNotification*) notification {
     //will trigger next page loading if necessary
-    [self.tableView reloadData];
+    if(self.viewModel.articles.count == 0) {
+        [self.viewModel searchArticles:nil];
+    }
 }
 
 -(void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
-//MARK: search loading and user actions
+
 -(void) scrollToTop {
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
--(void)searchArticles: (nullable NSTimer*) timer {
-    [self searchWillStart];
-    NSString* query = [timer.userInfo objectForKey:@"query"];
-    if(!query || [query isEqualToString:@""]) {
-        query = defaultQuery;
-    }
-    NSLog(@"Searched Query = %@", query);
-    [self.networkService loadArticlesFromQuery: query withHandler:^(NSArray *items, NSError *error) {
-        if(!error) {
-            [self searchDidFinish];
-            self.paginator.pageNumber = 0;
-            self.articles = [NSMutableArray arrayWithArray: items];
-            [self.tableView reloadData];
-        }
-    }];
+//MARK: MessageManagerDelegate
+-(void)didClickOk {
+    self.searchController.active = false;
 }
-
--(void) loadNextPage {
-    [self searchWillStart];
-    self.paginator.pageNumber += 1;
-    [self.networkService loadArticlesFromQuery:self.query  withPaginator:self.paginator withHandler:^(NSArray *items, NSError *error) {
-        [self searchDidFinish];
-        [self.articles addObjectsFromArray:items];
-        [self.tableView reloadData];
-    }];
+//MARK: ArticlesViewModelDelegate
+-(void)updateUI{
+    [self.tableView reloadData];
 }
 
 -(void) searchWillStart {
@@ -140,18 +122,7 @@ CGFloat const SearchInterval = 0.7;
 @implementation ViewController (SearchViewController)
 -(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     if(searchController == self.searchController) {
-        NSLog(@"to search = %@", searchController.searchBar.text);
-        NSString* q = searchController.searchBar.text;
-        if(q == nil || [q isEqualToString:@""]) {
-            self.query = defaultQuery;
-            return;
-        }
-        if(self.timer) {
-            [self.timer invalidate];
-            self.timer = nil;
-        }
-        self.query = q;
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:SearchInterval target:self selector:@selector(searchArticles:) userInfo:@{@"query": self.query} repeats:NO];
+        [self.viewModel startNewSearchForQuery:self.searchController.searchBar.text];
     }
 }
 @end
@@ -159,7 +130,7 @@ CGFloat const SearchInterval = 0.7;
 //MARK: TableView
 @implementation ViewController (TableViewHelper)
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.articles.count;
+    return self.viewModel.articles.count;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -171,20 +142,21 @@ CGFloat const SearchInterval = 0.7;
 -(void) configCell:(UITableViewCell*) aCell forIndexPath:(NSIndexPath*) indexPath {
     if([aCell isKindOfClass: [ArticleCell class]]) {
         ArticleCell* cell = (ArticleCell*) aCell;
-        cell.headlineLabel.text = self.articles[indexPath.row].headline;
-        [cell.thumbnailView sd_setImageWithURL:[NSURL URLWithString: self.articles[indexPath.row].thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
-        if(indexPath.row == self.articles.count - 5) {
-            [self loadNextPage];
+        cell.headlineLabel.text = self.viewModel.articles[indexPath.row].headline;
+        [cell.thumbnailView sd_setImageWithURL:[NSURL URLWithString: self.viewModel.articles[indexPath.row].thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+        if(indexPath.row == self.viewModel.articles.count - 5) {
+            [self.viewModel loadNextPage];
         }
     }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    Article* article = self.articles[indexPath.row];
+    Article* article = self.viewModel.articles[indexPath.row];
     DetailController* dc = [[DetailController alloc] initWithArticle:article];
     dc.navigationItem.title = article.headline;
     [self.navigationController pushViewController:dc animated:YES];
 }
+
 @end
 

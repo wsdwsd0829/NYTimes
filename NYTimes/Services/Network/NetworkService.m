@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, NYTimesAPI) {
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kReachabilityChangedNotification object:nil];
         [reachability startNotifier];
+        [self networkChanged:nil];
         
     }
     return self;
@@ -100,6 +101,12 @@ typedef NS_ENUM(NSUInteger, NYTimesAPI) {
 
 //Mark: Reachability Protocol
 -(void)networkChanged:(NSNotification*) notification {
+    if(notification == nil) {
+        if([reachability currentReachabilityStatus] == NotReachable) {
+            [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:@"kNotReachable"];
+        }
+        return;
+    }
     Reachability* reach = notification.object;
     if([reach currentReachabilityStatus] == ReachableViaWiFi || [reach currentReachabilityStatus] == ReachableViaWWAN) {
         NSString* isFromNotReachable = [[NSUserDefaults standardUserDefaults] stringForKey:@"kNotReachable"];

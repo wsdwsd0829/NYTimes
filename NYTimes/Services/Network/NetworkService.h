@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "ReachabilityServiceProtocol.h"
-
 #import "NetworkServiceProtocol.h"
 
 ///Flickr service to fetch data
