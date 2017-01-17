@@ -121,7 +121,7 @@
 //MARK: SearchController
 @implementation ViewController (SearchViewController)
 -(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    if(searchController == self.searchController) {
+    if(searchController == self.searchController && self.searchController.searchBar.text.length > 0) {
         [self.viewModel startNewSearchForQuery:self.searchController.searchBar.text];
     }
 }
