@@ -7,8 +7,17 @@
 //
 
 #import "ArticleCell.h"
+/*
+//!!! calling sequence is:
+//nodeForRowAtIndex, constraintedSizeForRow -> in controller for all cells;
+//then will call layoutSepcThatFits -> in Cell, so it knows content already;
+ 
+ //!!! tricks: 
+ //1. give image a preferred size
+ //2. set textNode's style.flexShrink to YES; so it shrink to size that fit the spec
+ */
 
-@interface ArticleCell ()
+@interface ArticleCell () <ASNetworkImageNodeDelegate>
 @end
 
 @implementation ArticleCell
@@ -17,53 +26,55 @@
     return NSStringFromClass(self);
 }
 
-//diff from collectionView with is initWithFrame
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+-(instancetype) init {
+    self = [super init];
     if(self) {
-        [self setupUI];
-        [self setupConstraints];
+         [self setupUI];
     }
     return self;
 }
 
+-(ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+    CGFloat ratio = (constrainedSize.min.height)/constrainedSize.max.width;
+    NSLog(@"%f, %f-> ratio: %f", constrainedSize.min.height, constrainedSize.max.width, ratio);
+    ASLayout * layout = [self.headlineLabel layoutThatFits:constrainedSize];
+    NSLog(@"Layout: %@", layout);
+
+    ASRatioLayoutSpec *imageRatioSpec = [ASRatioLayoutSpec
+                                         ratioLayoutSpecWithRatio:1
+                                         child: self.thumbnailView];
+    ASStackLayoutSpec* stackSpec = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:20 justifyContent:ASStackLayoutJustifyContentStart alignItems:ASStackLayoutAlignItemsStart children:@[imageRatioSpec, self.headlineLabel]];
+    ASInsetLayoutSpec* stackInset = [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(8, 8, 8, 8) child: stackSpec];
+    return stackInset;
+}
+
+
 -(void)setupUI {
-    self.thumbnailView = [[UIImageView alloc] init];
-    self.headlineLabel  = [[UILabel alloc] init];
-    self.headlineLabel.numberOfLines = 0;
-    self.headlineLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    self.thumbnailView = [[ASNetworkImageNode alloc] init];
+    self.thumbnailView.style.preferredSize = CGSizeMake(80, 80);
+    self.thumbnailView.delegate = self;
+    self.thumbnailView.defaultImage = [UIImage imageNamed:@"placeholder"];
+
+    self.headlineLabel  = [[ASTextNode alloc] init];
+    self.headlineLabel.style.flexShrink = YES; //!!!This will make textNode auto resizing
+
+    [self addSubnode:self.thumbnailView];
+    [self addSubnode:self.headlineLabel];
     
-    [self.contentView addSubview:self.thumbnailView];
-    [self.contentView addSubview:self.headlineLabel];
     self.thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
     self.thumbnailView.clipsToBounds = YES;
 }
 
--(void) setupConstraints {
-    
-    [self.thumbnailView mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.width.equalTo(@80);
-        make.height.equalTo(@80);
-        make.trailing.equalTo(self.headlineLabel.mas_leading).offset(-20);
-        make.leading.equalTo(self.contentView.mas_leading).offset(8);
-        make.top.equalTo(self.contentView.mas_top).offset(8);
-        make.bottom.lessThanOrEqualTo(self.contentView.mas_bottom).offset(-8);
-    }];
-    [self.headlineLabel mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.trailing.equalTo(self.contentView.mas_trailing).offset(-8);
-        make.top.equalTo(self.contentView.mas_top).offset(8);
-        make.bottom.equalTo(self.contentView.mas_bottom).offset(-8);
-        make.leading.equalTo(self.thumbnailView.mas_trailing).offset(20);
-    }];
+@end
+
+//MARK: NetworkImage delegate
+
+@implementation ArticleCell (ASNetworkImageNodeDelegate)
+- (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error {
+    NSLog(@"Image failed to load with error: \n%@", error);
 }
 
--(void)updateConstraints {
-    [self setupConstraints];
-    [super updateConstraints];
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image {
+    self.thumbnailView.image = image;
 }
-
--(void)layoutSubviews {
-    [super layoutSubviews];
-}
-
 @end

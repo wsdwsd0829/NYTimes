@@ -13,7 +13,7 @@
 @property (nonatomic, readonly, copy) NSString* headline;
 @property (nonatomic, readonly, copy) NSString* articleUrl;
 @property (nonatomic, copy) NSString* thumbnailUrl;
-
+-(NSURL*) articleURL;
 -(instancetype)initWithHeadline:(NSString*) headline withArticleUrl:(NSString*) url;
 
 @end

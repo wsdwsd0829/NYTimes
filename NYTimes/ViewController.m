@@ -14,10 +14,11 @@
 #import "ArticlesViewModel.h"
 #import "ArticleCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @interface ViewController () <ArticlesViewModelDelegate, MessageManagerDelegate>
 //main items
-@property (nonatomic) UITableView* tableView;
+@property (nonatomic) ASTableNode* tableNode;
 @property (nonatomic) ArticlesViewModel* viewModel;
 @property (nonatomic) id<NetworkServiceProtocol> networkService;
 //search
@@ -26,7 +27,7 @@
 @property (nonatomic) UIActivityIndicatorView* activityIndicator;
 @end
 
-@interface ViewController (TableViewHelper) <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController (TableViewHelper) <ASTableDelegate, ASTableDataSource>
 @end
 @interface ViewController (SearchViewController) <UISearchResultsUpdating>
 @end
@@ -44,21 +45,17 @@
     id<MessageManagerProtocol> messageManager = [[MessageManager alloc] init];
     messageManager.delegate = self;
     self.viewModel = [[ArticlesViewModel alloc] initWithNetworkService:networkService withMessageManager:messageManager];
-    [self.viewModel searchArticles: nil];
+    //[self.viewModel searchArticles: nil]; //batchUpdating Will handle it
     self.viewModel.delegate = self;
 }
 
 -(void) setupTableView {
-    self.tableView = [[UITableView alloc] init];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    self.tableView.estimatedRowHeight = 100;
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
-    [self.tableView registerClass:[ArticleCell class] forCellReuseIdentifier:[ArticleCell identifier]];
-    [self.view addSubview: self.tableView];
-    [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.view);
-    }];
+    self.tableNode = [[ASTableNode alloc] init];
+    self.tableNode.delegate = self;
+    self.tableNode.dataSource = self;
+    self.tableNode.frame = self.view.bounds;
+    
+    [self.view addSubnode: self.tableNode];
     
     //activity indicator
     CGRect footerRect = CGRectMake(0, 0, self.view.bounds.size.width, 40);
@@ -66,13 +63,13 @@
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [footerView addSubview: self.activityIndicator];
     self.activityIndicator.center = footerView.center;
-    self.tableView.tableFooterView = footerView;
+    self.tableNode.view.tableFooterView = footerView;
 }
 
 -(void)setupBars {
     //search bar
     self.searchController = [[UISearchController alloc] initWithSearchResultsController: nil];
-    self.tableView.tableHeaderView = self.searchController.searchBar;
+    self.tableNode.view.tableHeaderView = self.searchController.searchBar;
     
     //bar button item
     UIBarButtonItem* bbi = [[UIBarButtonItem alloc] initWithImage: [UIImage imageNamed:@"uparrow"] style:UIBarButtonItemStylePlain target:self action:@selector(scrollToTop)];
@@ -97,7 +94,7 @@
 }
 
 -(void) scrollToTop {
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.tableNode scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 //MARK: MessageManagerDelegate
@@ -106,7 +103,17 @@
 }
 //MARK: ArticlesViewModelDelegate
 -(void)updateUI{
-    [self.tableView reloadData];
+    [self.tableNode reloadData];
+}
+-(void)didFinishWithNewItems:(NSArray *)items {
+    NSMutableArray* arrIndexPaths = [[NSMutableArray alloc] init];
+    NSUInteger count = self.viewModel.articles.count;
+    for(__unused Article* item in items) {
+        [arrIndexPaths addObject:[NSIndexPath indexPathForRow:count inSection:0]];
+        count += 1;
+    }
+    [self.viewModel.articles addObjectsFromArray: items];
+    [self.tableNode insertRowsAtIndexPaths:arrIndexPaths withRowAnimation:UITableViewRowAnimationFade];
 }
 
 -(void) searchWillStart {
@@ -121,7 +128,7 @@
 //MARK: SearchController
 @implementation ViewController (SearchViewController)
 -(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    if(searchController == self.searchController) {
+    if(searchController == self.searchController && self.searchController.searchBar.text.length > 0) {
         [self.viewModel startNewSearchForQuery:self.searchController.searchBar.text];
     }
 }
@@ -129,29 +136,58 @@
 
 //MARK: TableView
 @implementation ViewController (TableViewHelper)
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+
+-(NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section {
     return self.viewModel.articles.count;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-   UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:[ArticleCell identifier] forIndexPath:indexPath];
-    [self configCell:cell forIndexPath:indexPath];
-    return cell;
+//-(ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return ^{
+//        ASTextCellNode* cellNode = [[ASTextCellNode alloc] init];
+//        cellNode.text = @"text";
+//        return cellNode;
+//    };
+//}
+-(ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath {
+    ArticleCell* cellNode = [[ArticleCell alloc] init];
+    [self configCell:cellNode forIndexPath:indexPath];
+    return cellNode;
+
 }
 
--(void) configCell:(UITableViewCell*) aCell forIndexPath:(NSIndexPath*) indexPath {
+- (ASSizeRange)tableNode:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CGSize min = CGSizeMake([UIScreen mainScreen].bounds.size.width, 56);
+    CGSize max = CGSizeMake([UIScreen mainScreen].bounds.size.width, INFINITY);
+    
+    return ASSizeRangeMake(min, max);
+}
+
+-(void) configCell:(ASCellNode*) aCell forIndexPath:(NSIndexPath*) indexPath {
     if([aCell isKindOfClass: [ArticleCell class]]) {
         ArticleCell* cell = (ArticleCell*) aCell;
-        cell.headlineLabel.text = self.viewModel.articles[indexPath.row].headline;
-        [cell.thumbnailView sd_setImageWithURL:[NSURL URLWithString: self.viewModel.articles[indexPath.row].thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
-        if(indexPath.row == self.viewModel.articles.count - 5) {
-            [self.viewModel loadNextPage];
-        }
+        UIFont *font = [UIFont fontWithName:@"Palatino-Roman" size:24.0];
+
+        NSDictionary *descriptionNodeAttributes = @{NSForegroundColorAttributeName : [UIColor lightGrayColor], NSFontAttributeName: font};
+        cell.headlineLabel.attributedText = [[NSAttributedString alloc] initWithString: self.viewModel.articles[indexPath.row].headline attributes:descriptionNodeAttributes];
+        NSLog(@"headline: %@", self.viewModel.articles[indexPath.row].headline);
+        NSLog(@"attr headline: %@", self.viewModel.articles[indexPath.row].headline);
+        cell.thumbnailView.URL = self.viewModel.articles[indexPath.row].articleURL;
     }
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+- (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode {
+    return YES;
+}
+
+- (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchWithContext:(ASBatchContext *)context {
+    [self.viewModel loadNextPageWithHandler:^(NSArray *items) {
+        [context completeBatchFetching:YES];
+    }];
+}
+
+
+-(void)tableNode:(ASTableNode *)tableNode didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableNode deselectRowAtIndexPath:indexPath animated:NO];
     Article* article = self.viewModel.articles[indexPath.row];
     DetailController* dc = [[DetailController alloc] initWithArticle:article];
     dc.navigationItem.title = article.headline;

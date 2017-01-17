@@ -14,6 +14,7 @@
 -(void)searchWillStart;
 -(void)searchDidFinish;
 -(void)updateUI;
+-(void)didFinishWithNewItems:(NSArray*) items;
 @end
 
 @interface ArticlesViewModel : BaseItemsViewModel
@@ -23,5 +24,6 @@
 -(void)searchArticles: (nullable NSTimer*) timer;
 -(void)startNewSearchForQuery:(nullable NSString * )q;
 -(void)loadNextPage;
+-(void) loadNextPageWithHandler: (void(^)(NSArray* items)) handler;
 @end
 

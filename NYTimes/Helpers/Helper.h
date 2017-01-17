@@ -13,5 +13,6 @@
 #import "NSString+Helper.h"
 #import "Utils.h"
 #import "Constants.h"
+#import "UIImage+ImageEffects.h"
 
 #endif /* Helper_h */

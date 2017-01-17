@@ -18,6 +18,15 @@
     }
     return self;
 }
+-(NSURL*) articleURL {
+    if(self.thumbnailUrl != nil) {
+        NSURL* url = [NSURL URLWithString:self.thumbnailUrl];
+        if(url) {
+            return url;
+        }
+    }
+    return nil;
+}
 
 
 

@@ -14,7 +14,26 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
+  - AsyncDisplayKit (2.0.1):
+    - AsyncDisplayKit/PINRemoteImage (= 2.0.1)
+  - AsyncDisplayKit/Core (2.0.1)
+  - AsyncDisplayKit/PINRemoteImage (2.0.1):
+    - AsyncDisplayKit/Core
+    - PINRemoteImage/iOS (= 3.0.0-beta.7)
+    - PINRemoteImage/PINCache
   - Masonry (1.0.2)
+  - PINCache (3.0.1-beta.2):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.2)
+    - PINCache/Core (= 3.0.1-beta.2)
+  - PINCache/Arc-exception-safe (3.0.1-beta.2):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.2)
+  - PINRemoteImage/Core (3.0.0-beta.7)
+  - PINRemoteImage/iOS (3.0.0-beta.7):
+    - PINRemoteImage/Core
+  - PINRemoteImage/PINCache (3.0.0-beta.7):
+    - PINCache (= 3.0.1-beta.2)
+    - PINRemoteImage/Core
   - SDWebImage (3.8.2):
     - SDWebImage/Core (= 3.8.2)
   - SDWebImage/Core (3.8.2)
@@ -22,16 +41,20 @@ PODS:
 
 DEPENDENCIES:
   - AFNetworking (~> 3.0)
+  - AsyncDisplayKit
   - Masonry
   - SDWebImage (~> 3.8)
   - SVProgressHUD (~> 2.0)
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  AsyncDisplayKit: 6c5a21d9ab30f3f48e877a67d44e3e19c1724f91
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
+  PINCache: 6d273a6e0754bd26e3f12a38a90dde73cc6a42b2
+  PINRemoteImage: ff63baf185088530db6cfa41cb665e2b5126b5c3
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
   SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
 
-PODFILE CHECKSUM: 6206a16e227c69072f32b82d7a336b9cbd479113
+PODFILE CHECKSUM: 90e1deedd60c5633208db1fc8c73aa238ecaa927
 
 COCOAPODS: 1.1.1

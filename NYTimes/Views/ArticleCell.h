@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface ArticleCell : UITableViewCell
+@interface ArticleCell : ASCellNode
 
-@property (nonatomic) UIImageView* thumbnailView;
-@property (nonatomic) UILabel* headlineLabel;
+@property (nonatomic) ASNetworkImageNode* thumbnailView;
+@property (nonatomic) ASTextNode* headlineLabel;
 +(NSString*) identifier;
 
 @end

@@ -7,6 +7,7 @@ def shared_pods
     pod 'SDWebImage', '~>3.8' 
     pod 'AFNetworking', '~> 3.0' 
     pod 'Masonry'
+    pod "AsyncDisplayKit"
 #    pod "SnapKit", '3.0.2'
 #    pod 'CocoaLumberjack', '~> 2.3'
 #    pod "MagicalRecord"

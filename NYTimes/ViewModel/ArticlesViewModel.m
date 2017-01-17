@@ -25,6 +25,7 @@ CGFloat const SearchInterval = 0.7;
     if(self) {
         self.paginator = [[Paginator alloc] initWithPageNumber: 0];
         self.query = defaultQuery;
+        self.articles = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -49,7 +50,7 @@ CGFloat const SearchInterval = 0.7;
 }
 
 -(void)startNewSearchForQuery:(NSString*)q {
-    if(q == nil || [q isEqualToString: @""]) {
+    if((q == nil || [q isEqualToString: @""]) && self.query.length == 0) {
         self.query = defaultQuery;
         return;
     }
@@ -66,8 +67,18 @@ CGFloat const SearchInterval = 0.7;
     self.paginator.pageNumber += 1;
     [self.networkService loadArticlesFromQuery:self.query  withPaginator:self.paginator withHandler:^(NSArray *items, NSError *error) {
         [self.delegate searchDidFinish];
-        [self.articles addObjectsFromArray:items];
-        [self.delegate updateUI];
+        [self.delegate didFinishWithNewItems:items];
+    }];
+}
+
+
+-(void) loadNextPageWithHandler: (void(^)(NSArray* items)) handler {
+    [self.delegate searchWillStart];
+    self.paginator.pageNumber += 1;
+    [self.networkService loadArticlesFromQuery:self.query  withPaginator:self.paginator withHandler:^(NSArray *items, NSError *error) {
+        [self.delegate searchDidFinish];
+        [self.delegate didFinishWithNewItems:items];
+        handler(items);
     }];
 }
 
