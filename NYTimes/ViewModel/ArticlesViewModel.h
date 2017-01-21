@@ -13,7 +13,6 @@
 @protocol ArticlesViewModelDelegate
 -(void)searchWillStart;
 -(void)searchDidFinish;
--(void)updateUI;
 @end
 
 @interface ArticlesViewModel : BaseItemsViewModel

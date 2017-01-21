@@ -12,8 +12,11 @@
 #import "MessageManager.h"
 #import "Article.h"
 #import "ArticlesViewModel.h"
+#import "ArticleViewModel.h"
 #import "ArticleCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import <ReactiveCocoa/ReactiveCocoa.h>
+#import "RACDelegateProxy.h"
 
 @interface ViewController () <ArticlesViewModelDelegate, MessageManagerDelegate>
 //main items
@@ -22,8 +25,9 @@
 @property (nonatomic) id<NetworkServiceProtocol> networkService;
 //search
 @property (nonatomic) UISearchController* searchController;
-
 @property (nonatomic) UIActivityIndicatorView* activityIndicator;
+    
+@property (nonatomic) id  viewModelDelegate;
 @end
 
 @interface ViewController (TableViewHelper) <UITableViewDelegate, UITableViewDataSource>
@@ -44,7 +48,28 @@
     id<MessageManagerProtocol> messageManager = [[MessageManager alloc] init];
     messageManager.delegate = self;
     self.viewModel = [[ArticlesViewModel alloc] initWithNetworkService:networkService withMessageManager:messageManager];
+    
+    @weakify(self);
+    [RACObserve(self, viewModel.articles) subscribeNext:^(id x) {
+        @strongify(self);
+        [self.tableView reloadData];
+    }];
+    
+    //self.viewModelDelegate = [[RACDelegateProxy alloc] initWithProtocol:@protocol(ArticlesViewModelDelegate)];
+    
+    [[self rac_signalForSelector:@selector(searchWillStart) fromProtocol:@protocol(ArticlesViewModelDelegate)] subscribeNext:^(RACTuple* value) {
+        @strongify(self);
+         [self.activityIndicator startAnimating];
+    }];
+    
+    [[self rac_signalForSelector:@selector(searchDidFinish) fromProtocol:@protocol(ArticlesViewModelDelegate)] subscribeNext:^(RACTuple* value) {
+        @strongify(self);
+        [self.activityIndicator stopAnimating];
+    }];
+    //can do same for collectionView Delegate or DataSource
+    
     [self.viewModel searchArticles: nil];
+    self.viewModel.delegate = nil;
     self.viewModel.delegate = self;
 }
 
@@ -105,16 +130,10 @@
     self.searchController.active = false;
 }
 //MARK: ArticlesViewModelDelegate
--(void)updateUI{
-    [self.tableView reloadData];
-}
-
+//avoid warning
 -(void) searchWillStart {
-    [self.activityIndicator startAnimating];
 }
-
 -(void) searchDidFinish {
-    [self.activityIndicator stopAnimating];
 }
 @end
 
@@ -142,7 +161,9 @@
 -(void) configCell:(UITableViewCell*) aCell forIndexPath:(NSIndexPath*) indexPath {
     if([aCell isKindOfClass: [ArticleCell class]]) {
         ArticleCell* cell = (ArticleCell*) aCell;
-        cell.headlineLabel.text = self.viewModel.articles[indexPath.row].headline;
+        cell.viewModel = [[ArticleViewModel alloc] initWithArticle:self.viewModel.articles[indexPath.row]];
+        //RAC(cell.headlineLabel, text) = RACObserve(cell.viewModel.article, headline); //!!! when resuse multiple signal will bind to textr
+        //cell.headlineLabel.text = self.viewModel.articles[indexPath.row].headline;
         [cell.thumbnailView sd_setImageWithURL:[NSURL URLWithString: self.viewModel.articles[indexPath.row].thumbnailUrl] placeholderImage:[UIImage imageNamed:@"placeholder"]];
         if(indexPath.row == self.viewModel.articles.count - 5) {
             [self.viewModel loadNextPage];

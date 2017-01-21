@@ -18,4 +18,9 @@ typedef void(^NetworkResultHandler)(NSArray* items, NSError* error);
 -(void)loadArticlesFromQuery:(NSString*) query forPage:(NSString*) page  withHandler: (NetworkResultHandler)handler;
 
 -(void)loadArticlesFromQuery:(NSString*) query withPaginator:(Paginator*) paginator  withHandler: (NetworkResultHandler)handler;
+    
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query withPaginator:(Paginator*) paginator;
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query;
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query forPage:(NSString*) page;
+    
 @end

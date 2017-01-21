@@ -28,7 +28,7 @@ CGFloat const SearchInterval = 0.7;
     }
     return self;
 }
-
+ 
 -(void)searchArticles: (nullable NSTimer*) timer {
     [self.delegate searchWillStart];
     NSString* query = [timer.userInfo objectForKey:@"query"];
@@ -36,18 +36,16 @@ CGFloat const SearchInterval = 0.7;
         query = defaultQuery;
     }
     NSLog(@"Searched Query = %@", query);
-    [self.networkService loadArticlesFromQuery: query withHandler:^(NSArray *items, NSError *error) {
-        if(!error) {
-            [self.delegate searchDidFinish];
-            self.paginator.pageNumber = 0;
-            self.articles = [NSMutableArray arrayWithArray: items];
-            [self.delegate updateUI];
-        } else {
-            [self p_handleError: error];
-        }
+    [[self.networkService loadArticlesFromQuery:query] subscribeNext:^(id x) {
+        NSArray* items = x;
+        [self.delegate searchDidFinish];
+        self.paginator.pageNumber = 0;
+        self.articles = [NSMutableArray arrayWithArray: items];
+    } error:^(NSError *error) {
+        [self p_handleError: error];
     }];
 }
-
+    
 -(void)startNewSearchForQuery:(NSString*)q {
     if(q == nil || [q isEqualToString: @""]) {
         self.query = defaultQuery;
@@ -64,11 +62,11 @@ CGFloat const SearchInterval = 0.7;
 -(void) loadNextPage {
     [self.delegate searchWillStart];
     self.paginator.pageNumber += 1;
-    [self.networkService loadArticlesFromQuery:self.query  withPaginator:self.paginator withHandler:^(NSArray *items, NSError *error) {
+    [[self.networkService loadArticlesFromQuery:self.query  withPaginator:self.paginator] subscribeNext:^(id items) {
         [self.delegate searchDidFinish];
-        [self.articles addObjectsFromArray:items];
-        [self.delegate updateUI];
+        NSMutableArray* newArticles = self.articles;
+        [newArticles addObjectsFromArray:items];
+        self.articles = newArticles;  //trigger reload KVO
     }];
 }
-
 @end

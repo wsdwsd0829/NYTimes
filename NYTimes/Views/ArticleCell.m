@@ -9,6 +9,7 @@
 #import "ArticleCell.h"
 
 @interface ArticleCell ()
+
 @end
 
 @implementation ArticleCell
@@ -23,10 +24,24 @@
     if(self) {
         [self setupUI];
         [self setupConstraints];
+        //Way1 (better):
+        RAC(self.headlineLabel, text) = RACObserve(self, viewModel.article.headline);
     }
     return self;
 }
 
+    
+//Way2:
+    //@property (nonatomic, strong) RACDisposable* subscription;
+//-(void)setViewModel:(ArticleViewModel *)viewModel {
+//    self.subscription = [RACObserve(viewModel, article.headline) setKeyPath:@keypath(self.headlineLabel, text) onObject:self.headlineLabel];
+//}
+//-(void)prepareForReuse {
+//    [self.subscription dispose];
+//    self.subscription = nil;
+//}
+    
+    
 -(void)setupUI {
     self.thumbnailView = [[UIImageView alloc] init];
     self.headlineLabel  = [[UILabel alloc] init];
@@ -40,14 +55,13 @@
 }
 
 -(void) setupConstraints {
-    
     [self.thumbnailView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.width.equalTo(@80);
         make.height.equalTo(@80);
         make.trailing.equalTo(self.headlineLabel.mas_leading).offset(-20);
         make.leading.equalTo(self.contentView.mas_leading).offset(8);
         make.top.equalTo(self.contentView.mas_top).offset(8);
-        make.bottom.lessThanOrEqualTo(self.contentView.mas_bottom).offset(-8);
+        make.bottom.lessThanOrEqualTo(self.contentView.mas_bottom).offset(-8).priority(999);
     }];
     [self.headlineLabel mas_updateConstraints:^(MASConstraintMaker *make) {
         make.trailing.equalTo(self.contentView.mas_trailing).offset(-8);

@@ -28,6 +28,7 @@
 		0D46A2971E2C692200F08BB1 /* MessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2951E2C692200F08BB1 /* MessageManager.m */; };
 		0D46A29A1E2C6A4B00F08BB1 /* BaseItemsViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */; };
 		0D46A29D1E2C6EEA00F08BB1 /* UIViewController+Navigations.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D46A29C1E2C6EE900F08BB1 /* UIViewController+Navigations.m */; };
+		0DEDD63E1E34035900C703D6 /* ArticleViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DEDD63D1E34035900C703D6 /* ArticleViewModel.m */; };
 		67952EFD4C751E88CF3E9546 /* Pods_NYTimes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66FF1D1E37DF0EF11265E991 /* Pods_NYTimes.framework */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,9 @@
 		0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseItemsViewModel.m; path = ViewModel/BaseItemsViewModel.m; sourceTree = "<group>"; };
 		0D46A29B1E2C6EE900F08BB1 /* UIViewController+Navigations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Navigations.h"; sourceTree = "<group>"; };
 		0D46A29C1E2C6EE900F08BB1 /* UIViewController+Navigations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Navigations.m"; sourceTree = "<group>"; };
+		0DEDD6091E31C10F00C703D6 /* NYTimes-Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NYTimes-Swift.h"; sourceTree = "<group>"; };
+		0DEDD63C1E34035900C703D6 /* ArticleViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArticleViewModel.h; path = ViewModel/ArticleViewModel.h; sourceTree = "<group>"; };
+		0DEDD63D1E34035900C703D6 /* ArticleViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ArticleViewModel.m; path = ViewModel/ArticleViewModel.m; sourceTree = "<group>"; };
 		3B71EA19142D7A351C9399D7 /* Pods-NYTimes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.debug.xcconfig"; sourceTree = "<group>"; };
 		66FF1D1E37DF0EF11265E991 /* Pods_NYTimes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NYTimes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC592A91A962FBC414A78009 /* Pods-NYTimes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NYTimes.release.xcconfig"; path = "Pods/Target Support Files/Pods-NYTimes/Pods-NYTimes.release.xcconfig"; sourceTree = "<group>"; };
@@ -142,6 +146,7 @@
 			children = (
 				0D46A2451E2C064900F08BB1 /* main.m */,
 				0D46A2731E2C18BD00F08BB1 /* NYTimes-Prefix.pch */,
+				0DEDD6091E31C10F00C703D6 /* NYTimes-Swift.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -237,6 +242,8 @@
 				0D46A2921E2C67F900F08BB1 /* ArticlesViewModel.m */,
 				0D46A2981E2C6A4B00F08BB1 /* BaseItemsViewModel.h */,
 				0D46A2991E2C6A4B00F08BB1 /* BaseItemsViewModel.m */,
+				0DEDD63C1E34035900C703D6 /* ArticleViewModel.h */,
+				0DEDD63D1E34035900C703D6 /* ArticleViewModel.m */,
 			);
 			name = ViewModels;
 			sourceTree = "<group>";
@@ -385,6 +392,7 @@
 				0D46A27E1E2C1B7F00F08BB1 /* ArticleCell.m in Sources */,
 				0D46A29D1E2C6EEA00F08BB1 /* UIViewController+Navigations.m in Sources */,
 				0D46A2491E2C064900F08BB1 /* AppDelegate.m in Sources */,
+				0DEDD63E1E34035900C703D6 /* ArticleViewModel.m in Sources */,
 				0D46A27A1E2C195C00F08BB1 /* Utils.m in Sources */,
 				0D46A28E1E2C539600F08BB1 /* Paginator.m in Sources */,
 				0D46A2461E2C064900F08BB1 /* main.m in Sources */,
@@ -511,6 +519,7 @@
 			baseConfigurationReference = 3B71EA19142D7A351C9399D7 /* Pods-NYTimes.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9MKJC68VMT;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/NYTimes-Prefix.pch";
@@ -526,6 +535,7 @@
 			baseConfigurationReference = DC592A91A962FBC414A78009 /* Pods-NYTimes.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9MKJC68VMT;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/NYTimes-Prefix.pch";

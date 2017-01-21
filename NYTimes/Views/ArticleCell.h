@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "ArticleViewModel.h"
 @interface ArticleCell : UITableViewCell
-
+    @property (nonatomic) ArticleViewModel* viewModel;
 @property (nonatomic) UIImageView* thumbnailView;
 @property (nonatomic) UILabel* headlineLabel;
 +(NSString*) identifier;
 
+    
 @end

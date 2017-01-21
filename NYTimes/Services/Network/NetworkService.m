@@ -88,9 +88,48 @@ typedef NS_ENUM(NSUInteger, NYTimesAPI) {
             handler(nil, error);
         }
     }];
-
 }
 
+//MARK: ReactiveCocoa
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query withPaginator:(Paginator*) paginator {
+    NSString* pageNumber = [NSString stringWithFormat: @"%lu", (unsigned long)paginator.pageNumber];
+    return [self loadArticlesFromQuery:query forPage:pageNumber];
+}
+    
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query {
+    return [self loadArticlesFromQuery:query forPage: @"0"];
+}
+-(RACSignal*)loadArticlesFromQuery:(NSString*) query forPage:(NSString*) page {
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+        NSDictionary* params = @{@"q": query, @"page": page, @"api-key": APIKey};
+        // [self.apiClient fetchWithParams: params withApi: apiUrl withHandler:(HttpHandler)
+        [apiClient fetchWithParams:params withApi: [self p_apiStr: Article] withHandler: ^(NSURLResponse *response, id responseObject, NSError *error) {
+            if (!error && ((NSHTTPURLResponse*)response).statusCode == 200) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    //Parse result in background thread
+                    [parser parse: responseObject withHandler: ^(NSArray* items, NSError* error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            //handler(items, error);
+                            if(!error) {
+                                [subscriber sendNext:items];
+                                [subscriber sendCompleted];
+                            } else {
+                                [subscriber sendError:error];
+                            }
+                        });
+                        //!!!cannot increase page num here cause, same page may load multiple times
+                    }];
+                });
+                
+            } else {
+                // if status Code 401, need re-auth;
+                [subscriber sendError:error];
+            }
+        }];
+        return nil;
+    }];
+}
+    
 -(NSString*)p_apiStr:(NYTimesAPI) api {
     switch (api) {
         case Article:
